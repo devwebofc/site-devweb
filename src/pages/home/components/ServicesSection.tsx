@@ -8,6 +8,20 @@ interface ServicesSectionProps {
 export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBriefing }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const sectionRef = useRef<HTMLElement>(null);
+  const mocksRef = useRef<HTMLDivElement>(null);
+
+  // No celular os mockups são desenhados em 300px de largura e reduzidos por inteiro,
+  // mantendo as proporções (o texto encolhe junto, sem se sobrepor)
+  useEffect(() => {
+    const el = mocksRef.current;
+    if (!el) return;
+    const update = () => el.style.setProperty('--k', String(el.clientWidth / 300));
+    update();
+    if (!('ResizeObserver' in window)) return;
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   // Interactive mock states
   const [instTab, setInstTab] = useState<'inicio' | 'sobre' | 'servicos' | 'contato'>('inicio');
@@ -351,7 +365,7 @@ export const ServicesSection: React.FC<ServicesSectionProps> = ({ onOpenBriefing
 
           {/* Center Column: Tall Rounded Interactive Card */}
           <div className={styles.colCenter}>
-            <div className={styles.cds}>
+            <div className={styles.cds} ref={mocksRef}>
               <div className={`${styles.cd} ${activeIndex === 0 ? styles.on : ''}`}>
                 {renderLandingMock()}
               </div>
